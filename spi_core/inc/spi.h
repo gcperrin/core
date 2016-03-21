@@ -2,12 +2,13 @@
 #define SPI_H
 
 //#include "BlackCore.h"
+#include "BlackGPIO.h"
 #include "BlackSPI.h"
 
 class SPI
 {
  public:
-  BlackLib::spiName spi_name;
+  //BlackLib::spiName spi_name;
   SPI();
   virtual ~SPI();
   void write();
@@ -16,7 +17,8 @@ class SPI
   void read_burst();
 
  private:
-  BlackLib::BlackSPI spi_core(spi_name[0]);
+  //BlackLib::spiName spi_name;
+  //BlackLib::BlackSPI spi_core(BlackLib::SPI0_0);
 
 };
 

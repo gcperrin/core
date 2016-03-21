@@ -9,16 +9,19 @@
 #####################################################################
 
 CXX           = g++
-DEFINES       = -D__GXX_EXPERIMENTAL_CXX0X__ -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
+DEFINES       = -D__GXX_EXPERIMENTAL_CXX0X__ -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 \
+		-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 -D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 \
+		-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
 CXXFLAGS      = -std=c++0x -O0 -g3 -Wall -c -fmessage-length=0 -pthread $(DEFINES)
-INCPATH       =  -I./inc -I./lib/v3_0 -I./lib/v3_0/BlackSPI 
+INCPATH       =  -I./inc -I./lib/v3_0 -I./lib/v3_0/BlackSPI -I./lib/v3_0/BlackGPIO
 LINK          = g++
 LFLAGS        =
-LIBS          = -L./lib -L./lib/v3_0 -L./lib/v3_0/BlackSPI -L./src
+LIBS          = -L./lib -L./lib/v3_0 -L./lib/v3_0/BlackSPI -L./lib/v3_0/BlackGPIO -L./src
 DEL_FILE      = rm -f
 
 ####### Files
-SOURCES       = lib/v3_0/BlackCore.cpp lib/v3_0/BlackSPI/BlackSPI.cpp main.cpp src/spi.cpp
+SOURCES       = lib/v3_0/BlackCore.cpp lib/v3_0/BlackSPI/BlackSPI.cpp \
+		lib/v3_0/BlackGPIO/BlackGPIO.cpp main.cpp src/spi.cpp
 OBJECTS       = $(SOURCES:.cpp=.o)
 DESTDIR       =
 TARGET        = core
