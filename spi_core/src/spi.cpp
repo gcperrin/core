@@ -4,9 +4,9 @@
 #include <iostream>
 #include <string>
 
-SPI::SPI()
+SPI::SPI(BlackLib::BlackSPI spi_core)
 {
-  BlackLib::BlackSPI spi_core(BlackLib::SPI0_0, 8, BlackLib::SpiDefault, 800000);
+  this->is_up = true;
   BlackLib::BlackGPIO GDO0(BlackLib::GPIO_48, BlackLib::input);
 
   const unsigned char PA_LEN = 1;
@@ -35,7 +35,7 @@ SPI::SPI()
   uint8_t byte23[2] = { TEST0, 0x09 };
   uint8_t byte24[3] = { PATABLE, 0x8E, PA_LEN };
 
-  bool isOpened = spi_core.open(BlackLib::ReadWrite|BlackLib::NonBlock);
+  bool isOpened = spi_core.open(BlackLib::ReadWrite);
 
   if (!isOpened) {
     std::cout << "SPI DEVICE CAN\'T OPEN.;" << std::endl;
@@ -44,41 +44,52 @@ SPI::SPI()
   
   uint8_t readBytes[2];
 
-  spi_core.transfer(byte1, readBytes, sizeof(byte1), 0);
-  spi_core.transfer(byte2, readBytes, sizeof(byte2), 0);
-  spi_core.transfer(byte3, readBytes, sizeof(byte3), 0);
-  spi_core.transfer(byte4, readBytes, sizeof(byte4), 0);
-  spi_core.transfer(byte5, readBytes, sizeof(byte5), 0);
-  spi_core.transfer(byte6, readBytes, sizeof(byte6), 0);
-  spi_core.transfer(byte7, readBytes, sizeof(byte7), 0);
-  spi_core.transfer(byte8, readBytes, sizeof(byte8), 0);
-  spi_core.transfer(byte9, readBytes, sizeof(byte9), 0);
-  spi_core.transfer(byte10, readBytes, sizeof(byte10), 0);
-  spi_core.transfer(byte11, readBytes, sizeof(byte11), 0);
-  spi_core.transfer(byte12, readBytes, sizeof(byte12), 0);
-  spi_core.transfer(byte13, readBytes, sizeof(byte13), 0);
-  spi_core.transfer(byte14, readBytes, sizeof(byte14), 0);
-  spi_core.transfer(byte15, readBytes, sizeof(byte15), 0);
-  spi_core.transfer(byte16, readBytes, sizeof(byte16), 0);
-  spi_core.transfer(byte17, readBytes, sizeof(byte17), 0);
-  spi_core.transfer(byte18, readBytes, sizeof(byte18), 0);
-  spi_core.transfer(byte19, readBytes, sizeof(byte19), 0);
-  spi_core.transfer(byte20, readBytes, sizeof(byte20), 0);
-  spi_core.transfer(byte21, readBytes, sizeof(byte21), 0);
-  spi_core.transfer(byte22, readBytes, sizeof(byte22), 0);
-  spi_core.transfer(byte23, readBytes, sizeof(byte23), 0);
-  spi_core.transfer(byte24, readBytes, sizeof(byte24), 0);
+  spi_core.transfer(byte1, readBytes, sizeof(byte1), 1);
+  spi_core.transfer(byte2, readBytes, sizeof(byte2), 1);
+  spi_core.transfer(byte3, readBytes, sizeof(byte3), 1);
+  spi_core.transfer(byte4, readBytes, sizeof(byte4), 1);
+  spi_core.transfer(byte5, readBytes, sizeof(byte5), 1);
+  spi_core.transfer(byte6, readBytes, sizeof(byte6), 1);
+  spi_core.transfer(byte7, readBytes, sizeof(byte7), 1);
+  spi_core.transfer(byte8, readBytes, sizeof(byte8), 1);
+  spi_core.transfer(byte9, readBytes, sizeof(byte9), 1);
+  spi_core.transfer(byte10, readBytes, sizeof(byte10), 1);
+  spi_core.transfer(byte11, readBytes, sizeof(byte11), 1);
+  spi_core.transfer(byte12, readBytes, sizeof(byte12), 1);
+  spi_core.transfer(byte13, readBytes, sizeof(byte13), 1);
+  spi_core.transfer(byte14, readBytes, sizeof(byte14), 1);
+  spi_core.transfer(byte15, readBytes, sizeof(byte15), 1);
+  spi_core.transfer(byte16, readBytes, sizeof(byte16), 1);
+  spi_core.transfer(byte17, readBytes, sizeof(byte17), 1);
+  spi_core.transfer(byte18, readBytes, sizeof(byte18), 1);
+  spi_core.transfer(byte19, readBytes, sizeof(byte19), 1);
+  spi_core.transfer(byte20, readBytes, sizeof(byte20), 1);
+  spi_core.transfer(byte21, readBytes, sizeof(byte21), 1);
+  spi_core.transfer(byte22, readBytes, sizeof(byte22), 1);
+  spi_core.transfer(byte23, readBytes, sizeof(byte23), 1);
+  spi_core.transfer(byte24, readBytes, sizeof(byte24), 1);
 
   //while (spi_core.isOpen() == true);
-  uint8_t rx_fifo[1] = { RXFIFO|READ_BURST };
-  uint8_t set_idle[1] = { SIDLE };
-  uint8_t set_rx[1] = { SRX };
-  std::string testValue = "1";
+  //uint8_t rx_fifo[1] = { RXFIFO|READ_BURST };
+  //uint8_t set_idle[1] = { SIDLE };
+  //uint8_t set_rx[1] = { SRX };
+  //std::string testValue = "1";
+  this->is_up = false;
+  spi_core.close();
+  /*
   while (true) {
+
+
+
+
+
+
+
+ 
     std::string gdoValue;
     gdoValue = GDO0.getValue();
 
-    //std::cout << gdoValue << std::endl;
+    std::cout << gdoValue << std::endl;
     while (gdoValue.compare(testValue) != 0);
 
     //Set idle
@@ -109,7 +120,7 @@ SPI::SPI()
     spi_core.transfer(SRX, 10);
   }
    
-
+  */
   /*
   std::cout << std::endl;
   std::cout << "Device Path   : " << spi_core.getPortName() << std::endl;
