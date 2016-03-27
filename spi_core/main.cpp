@@ -7,8 +7,13 @@
 #include "spi.h"
 using namespace std;
 
-BlackLib::BlackSPI spi_core(BlackLib::SPI0_0, 8, BlackLib::SpiDefault, 2400000);
-//BlackLib::BlackGPIO GDO0(BlackLib::GPIO_48, BlackLib::input);
+BlackLib::BlackSPI spi_core(BlackLib::SPI0_0, 8, BlackLib::SpiDefault, 800000);
+BlackLib::BlackSPI* spi_core2 = new BlackLib::BlackSPI(BlackLib::SPI0_0,
+						       8,
+						       BlackLib::SpiDefault,
+						       800000);
+BlackLib::BlackGPIO* GDO0 = new BlackLib::BlackGPIO(BlackLib::GPIO_48,
+						    BlackLib::input);
 SPI* cc1101_spi = new SPI(spi_core);
 
 /*
@@ -37,7 +42,7 @@ static gboolean dataRequest(void* data)
 {
   // Will need to ask redis queue for all board to query
   cout << "Requesting data..." << endl;
-  cc1101_spi->getData(spi_core);
+  cc1101_spi->getData(spi_core2, GDO0);
 }
 
 int main(int argc, char** argv)

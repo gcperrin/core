@@ -13,6 +13,8 @@ class SPI
   void write_burst();
   void read();
   void read_burst();
+  void getData(BlackLib::BlackSPI* spi_core,
+	       BlackLib::BlackGPIO* GDO0);
   bool is_up;
 
 };

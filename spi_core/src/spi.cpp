@@ -7,7 +7,7 @@
 SPI::SPI(BlackLib::BlackSPI spi_core)
 {
   this->is_up = true;
-  BlackLib::BlackGPIO GDO0(BlackLib::GPIO_48, BlackLib::input);
+  //BlackLib::BlackGPIO GDO0(BlackLib::GPIO_48, BlackLib::input);
 
   const unsigned char PA_LEN = 1;
   uint8_t byte1[2]  = { IOCFG0, 0x06 };
@@ -75,7 +75,7 @@ SPI::SPI(BlackLib::BlackSPI spi_core)
   //uint8_t set_rx[1] = { SRX };
   //std::string testValue = "1";
   this->is_up = false;
-  spi_core.close();
+  //spi_core.close();
   /*
   while (true) {
 
@@ -155,5 +155,45 @@ void SPI::read()
 
 void SPI::read_burst()
 {
+
+}
+
+
+void SPI::getData(BlackLib::BlackSPI* spi_core,
+		  BlackLib::BlackGPIO* GDO0)
+{
+  
+  bool isOpened = spi_core->open(BlackLib::ReadWrite);
+  //spi_core->transfer(SIDLE);
+  char len = 3;
+  uint8_t tx_fifo[1] = { TXFIFO|WRITE_BURST };
+  uint8_t writeArr[4] = {TXFIFO|WRITE_BURST, 0x02,
+			 0x01, 0xAA};
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA,
+			  //0x00, 0xAA};
+  uint8_t readArr[4];
+
+  //spi_core->transfer(tx_fifo, readArr, sizeof(tx_fifo), 0);
+  spi_core->transfer(writeArr, readArr, sizeof(writeArr), 0);
+  spi_core->transfer(STX);
+  //while (GDO0->getValue() == "0") { std::cout << GDO0->getValue() << std::endl; };
+  while (GDO0->getValue() != "1") { std::cout << GDO0->getValue() << std::endl; };
+  while (GDO0->getValue() != "0") { std::cout << GDO0->getValue() << std::endl; };
+  spi_core->transfer(SIDLE);
+  
+  spi_core->close();
 
 }
