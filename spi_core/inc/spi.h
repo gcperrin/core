@@ -15,6 +15,9 @@ class SPI
   void read_burst();
   void getData(BlackLib::BlackSPI* spi_core,
 	       BlackLib::BlackGPIO* GDO0);
+  void readData(BlackLib::BlackSPI* spi_core);
+  void set_rx(BlackLib::BlackSPI* spi_core);
+  void flush_rx(BlackLib::BlackSPI* spi_core);
   bool is_up;
 
 };

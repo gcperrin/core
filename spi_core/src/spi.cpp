@@ -11,7 +11,7 @@ SPI::SPI(BlackLib::BlackSPI spi_core)
 
   const unsigned char PA_LEN = 1;
   uint8_t byte1[2]  = { IOCFG0, 0x06 };
-  uint8_t byte2[2]  = { IOCFG2, 0x06 };
+  uint8_t byte2[2]  = { IOCFG2, 0x07 };
   uint8_t byte3[2]  = { FIFOTHR, 0x47 };
   uint8_t byte4[2]  = { PKTCTRL0, 0x05 };
   uint8_t byte5[2]  = { FSCTRL1, 0x06 };
@@ -20,7 +20,7 @@ SPI::SPI(BlackLib::BlackSPI spi_core)
   uint8_t byte8[2]  = { FREQ0, 0x3B };
   uint8_t byte9[2]  = { MDMCFG4, 0xF5 };
   uint8_t byte10[2] = { MDMCFG3, 0x83 };
-  uint8_t byte11[2] = { MDMCFG2, 0x1B };
+  uint8_t byte11[2] = { MDMCFG2, 0x13 };
   uint8_t byte12[2] = { MDMCFG1, 0x22 };
   uint8_t byte13[2] = { DEVIATN, 0x31 };
   uint8_t byte14[2] = { MCSM0, 0x18 };
@@ -33,7 +33,7 @@ SPI::SPI(BlackLib::BlackSPI spi_core)
   uint8_t byte21[2] = { TEST2, 0x81 };
   uint8_t byte22[2] = { TEST1, 0x35 };
   uint8_t byte23[2] = { TEST0, 0x09 };
-  uint8_t byte24[3] = { PATABLE, 0x8E, PA_LEN };
+  uint8_t byte24[3] = { PATABLE, 0xC0, PA_LEN };
 
   bool isOpened = spi_core.open(BlackLib::ReadWrite);
 
@@ -69,67 +69,7 @@ SPI::SPI(BlackLib::BlackSPI spi_core)
   spi_core.transfer(byte23, readBytes, sizeof(byte23), 1);
   spi_core.transfer(byte24, readBytes, sizeof(byte24), 1);
 
-  //while (spi_core.isOpen() == true);
-  //uint8_t rx_fifo[1] = { RXFIFO|READ_BURST };
-  //uint8_t set_idle[1] = { SIDLE };
-  //uint8_t set_rx[1] = { SRX };
-  //std::string testValue = "1";
   this->is_up = false;
-  //spi_core.close();
-  /*
-  while (true) {
-
-
-
-
-
-
-
- 
-    std::string gdoValue;
-    gdoValue = GDO0.getValue();
-
-    std::cout << gdoValue << std::endl;
-    while (gdoValue.compare(testValue) != 0);
-
-    //Set idle
-    spi_core.transfer(SIDLE, 10);
-
-    // Poll RX I guess
-    //usleep(1000);
-    uint8_t preamble[2];
-    uint8_t status[2];
-    uint8_t packet_length[1];
-    uint8_t rx_buffer[4];
-
-    spi_core.transfer(rx_fifo, packet_length, sizeof(packet_length));
-
-    // Dummy write
-    spi_core.transfer(0x00, 10);
-    spi_core.transfer(rx_fifo, preamble, sizeof(preamble), 0);
-
-    // Dummy write
-    spi_core.transfer(0x00, 10);
-    spi_core.transfer(rx_fifo, rx_buffer, sizeof(rx_buffer), 0);
-
-    // Dummy write
-    spi_core.transfer(0x00, 10);
-    spi_core.transfer(rx_fifo, status, sizeof(status), 0);
-
-    // Set RX
-    spi_core.transfer(SRX, 10);
-  }
-   
-  */
-  /*
-  std::cout << std::endl;
-  std::cout << "Device Path   : " << spi_core.getPortName() << std::endl;
-  std::cout << "Max Speed(Hz) : " << spi_core.getMaximumSpeed() << std::endl;
-  std::cout << "Bits Per Word : " << (int)spi_core.getBitsPerWord() << std::endl;
-  std::cout << "Mode          : " << (int)spi_core.getMode() << std::endl << std::endl;
-  */
-
-  
 
 }
 
@@ -158,17 +98,30 @@ void SPI::read_burst()
 
 }
 
+void SPI::set_rx(BlackLib::BlackSPI* spi_core) 
+{
+  bool isOpened = spi_core->open(BlackLib::ReadWrite);
+  spi_core->transfer(SRX);
+  spi_core->close();
+}
+
+void SPI::flush_rx(BlackLib::BlackSPI* spi_core) 
+{
+  bool isOpened = spi_core->open(BlackLib::ReadWrite);
+  spi_core->transfer(SFRX);
+  spi_core->close();
+}
 
 void SPI::getData(BlackLib::BlackSPI* spi_core,
-		  BlackLib::BlackGPIO* GDO0)
+		      BlackLib::BlackGPIO* GDO0)
 {
   
   bool isOpened = spi_core->open(BlackLib::ReadWrite);
-  //spi_core->transfer(SIDLE);
+  spi_core->transfer(SIDLE);
   char len = 3;
   uint8_t tx_fifo[1] = { TXFIFO|WRITE_BURST };
-  uint8_t writeArr[4] = {TXFIFO|WRITE_BURST, 0x02,
-			 0x01, 0xAA};
+  uint8_t writeArr[3] = {TXFIFO|WRITE_BURST, 0x01,
+			 0xDA};
 			  //0x00, 0xAA,
 			  //0x00, 0xAA,
 			  //0x00, 0xAA,
@@ -186,14 +139,51 @@ void SPI::getData(BlackLib::BlackSPI* spi_core,
 			  //0x00, 0xAA};
   uint8_t readArr[4];
 
-  //spi_core->transfer(tx_fifo, readArr, sizeof(tx_fifo), 0);
   spi_core->transfer(writeArr, readArr, sizeof(writeArr), 0);
   spi_core->transfer(STX);
-  //while (GDO0->getValue() == "0") { std::cout << GDO0->getValue() << std::endl; };
   while (GDO0->getValue() != "1") { std::cout << GDO0->getValue() << std::endl; };
   while (GDO0->getValue() != "0") { std::cout << GDO0->getValue() << std::endl; };
-  spi_core->transfer(SIDLE);
-  
+  spi_core->transfer(SRX);
   spi_core->close();
 
+}
+
+/*
+ * Read incoming packet off the SPI bus
+ */
+void SPI::readData(BlackLib::BlackSPI* spi_core)
+{
+  bool isOpened = spi_core->open(BlackLib::ReadWrite);
+  spi_core->transfer(SIDLE);
+  uint8_t rx_fifo[1] = { RXFIFO|READ_BURST };
+  uint8_t preamble[4];
+  uint8_t status[2];
+  uint8_t packet_length[1];
+  uint8_t rx_buffer[4];
+
+  spi_core->transfer(rx_fifo, packet_length, sizeof(packet_length));
+  // Dummy write
+  spi_core->transfer(0x00, 10);
+  spi_core->transfer(rx_fifo, preamble, sizeof(preamble), 0);
+
+  std::cout << std::hex << static_cast<int>(preamble[0]) << std::endl;
+  std::cout << std::hex << static_cast<int>(preamble[1]) << std::endl;
+  std::cout << std::hex << static_cast<int>(preamble[2]) << std::endl;
+  std::cout << std::hex << static_cast<int>(preamble[3]) << std::endl;
+
+  spi_core->transfer(0x00, 10);
+  spi_core->transfer(rx_fifo, rx_buffer, sizeof(rx_buffer), 0);
+
+  std::cout << std::hex << static_cast<int>(rx_buffer[0]) << std::endl;
+  std::cout << std::hex << static_cast<int>(rx_buffer[1]) << std::endl;
+  std::cout << std::hex << static_cast<int>(rx_buffer[2]) << std::endl;
+  std::cout << std::hex << static_cast<int>(rx_buffer[3]) << std::endl;
+
+  // Dummy write
+  //spi_core.transfer(0x00, 10);
+  //spi_core.transfer(rx_fifo, status, sizeof(status), 0);
+
+
+  spi_core->transfer(SRX);
+  spi_core->close();
 }

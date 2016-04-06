@@ -1,0 +1,54 @@
+CONTENTS OF THIS FILE
+---------------------
+ * Introduction
+ * Requirements
+ * Recommended modules
+ * Installation
+ * Configuration
+ * Troubleshooting
+ * FAQ
+ * Maintainers
+
+
+INTRODUCTION
+------------
+This repository serves as the Core modules for the S.I.N data hub. It's primary duty
+is to interact with a TI CC1101 RF module, which sends commands in the format of
+a sensor board ID, with the coorsponding board transmitting data that is
+recieved and placed in a redis queue.
+
+REQUIREMENTS
+------------
+At the kernel level, it requires binutils, build-essentials, C++, redis, and hredis.
+Other modules such as BlackLib and RedisClient (C++ wrapper for hredis) are
+included directly in this repository.
+
+RECOMMENDED MODULES
+-------------------
+If making changes to the master, git is obviously required. In addition, if
+running headless, a combination of VIM or EMACS and TMUX make development                  
+much easier.
+                                                                            
+INSTALLATION 
+------------                                                                               
+Kernel-level installations can be done through installation scripts that reside 
+in the config folder. Again, these assume apt-get as a the package manager (for now). 
+Production repositories reside said home folder and are never to be directly
+developed within, unless an emergency dictates such.                           
+
+CONFIGURATION
+-------------
+BlackLib SPI will need to be configured via the script in lib. See Makefile for compiled
+modules and directives.
+
+Setup script (responsible for setting GPIOs) can be run directly or through the
+related make directive.
+
+TROUBLESHOOTING
+--------------
+To-do
+
+MAINTAINERS
+-------------
+Greg Perrin
+grpe9055@colorado.edu

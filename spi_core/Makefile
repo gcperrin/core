@@ -22,10 +22,11 @@ DEL_FILE      = rm -f
 
 ####### Files
 SOURCES       = lib/v3_0/BlackCore.cpp lib/v3_0/BlackSPI/BlackSPI.cpp \
-		lib/v3_0/BlackGPIO/BlackGPIO.cpp main.cpp src/spi.cpp
+		lib/v3_0/BlackGPIO/BlackGPIO.cpp main.cpp src/spi.cpp src/RedisClient.cpp
 OBJECTS       = $(SOURCES:.cpp=.o)
 DESTDIR       =
 TARGET        = core
+SETUP         = ./setup
 
 first: all
 
@@ -43,6 +44,8 @@ $(TARGET):  $(OBJECTS)
 
 clean:
 			-$(DEL_FILE) $(OBJECTS)
+set:
+			-$(SETUP)
 
 distclean: clean
 			-$(DEL_FILE) $(TARGET)

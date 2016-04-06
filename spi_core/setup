@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Setup GPIO pins for ISR in core
+echo "Setting up GPIO ISR PINS"
+
+# Packet RX interrupt pin
+echo 49 > /sys/class/gpio/export
+echo rising > /sys/class/gpio/gpio49/edge
