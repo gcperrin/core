@@ -3,10 +3,17 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 SPI::SPI(BlackLib::BlackSPI spi_core)
 {
   this->is_up = true;
+  if (!this->redis_cli.Initialize("127.0.0.1", 6379, 2, 10)) {
+    std::cout << "connect to redis failed" << std::endl;
+  } else {
+    std::cout << "Redis connected" << std::endl;
+  }
+
   //BlackLib::BlackGPIO GDO0(BlackLib::GPIO_48, BlackLib::input);
 
   const unsigned char PA_LEN = 1;
@@ -159,31 +166,24 @@ void SPI::readData(BlackLib::BlackSPI* spi_core)
   uint8_t preamble[4];
   uint8_t status[2];
   uint8_t packet_length[1];
-  uint8_t rx_buffer[4];
-
-  spi_core->transfer(rx_fifo, packet_length, sizeof(packet_length));
-  // Dummy write
-  spi_core->transfer(0x00, 10);
-  spi_core->transfer(rx_fifo, preamble, sizeof(preamble), 0);
-
-  std::cout << std::hex << static_cast<int>(preamble[0]) << std::endl;
-  std::cout << std::hex << static_cast<int>(preamble[1]) << std::endl;
-  std::cout << std::hex << static_cast<int>(preamble[2]) << std::endl;
-  std::cout << std::hex << static_cast<int>(preamble[3]) << std::endl;
+  uint8_t rx_buffer[17];
 
   spi_core->transfer(0x00, 10);
-  spi_core->transfer(rx_fifo, rx_buffer, sizeof(rx_buffer), 0);
+  spi_core->transfer(rx_fifo, rx_buffer, 17, 0);
+  std::cout << sizeof(rx_buffer) << std::endl;
+  std::stringstream ss;
+  for (int i=0; i<17; i++) {    
+    ss << rx_buffer[i];
+  }
 
-  std::cout << std::hex << static_cast<int>(rx_buffer[0]) << std::endl;
-  std::cout << std::hex << static_cast<int>(rx_buffer[1]) << std::endl;
-  std::cout << std::hex << static_cast<int>(rx_buffer[2]) << std::endl;
-  std::cout << std::hex << static_cast<int>(rx_buffer[3]) << std::endl;
-
-  // Dummy write
-  //spi_core.transfer(0x00, 10);
-  //spi_core.transfer(rx_fifo, status, sizeof(status), 0);
-
-
+  std::string data_arr = ss.str();
+  std::cout << data_arr << std::endl;
+  std::string strKey = "bDA_data";
+  if (this->redis_cli.Set(strKey, data_arr) == RC_SUCCESS) {
+    std::cout << "I'm yung" << std::endl;
+  } else {
+    std::cout << "fuck you bitch" << std::endl;
+  }
   spi_core->transfer(SRX);
   spi_core->close();
 }

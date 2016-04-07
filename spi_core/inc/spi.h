@@ -3,6 +3,7 @@
 
 #include "BlackGPIO.h"
 #include "BlackSPI.h"
+#include "RedisClient.h"
 
 class SPI
 {
@@ -19,6 +20,9 @@ class SPI
   void set_rx(BlackLib::BlackSPI* spi_core);
   void flush_rx(BlackLib::BlackSPI* spi_core);
   bool is_up;
+
+ private:
+  CRedisClient redis_cli;
 
 };
 
