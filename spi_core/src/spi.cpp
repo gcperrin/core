@@ -129,21 +129,6 @@ void SPI::getData(BlackLib::BlackSPI* spi_core,
   uint8_t tx_fifo[1] = { TXFIFO|WRITE_BURST };
   uint8_t writeArr[3] = {TXFIFO|WRITE_BURST, 0x01,
 			 0xDA};
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA,
-			  //0x00, 0xAA};
   uint8_t readArr[4];
 
   spi_core->transfer(writeArr, readArr, sizeof(writeArr), 0);
@@ -152,7 +137,16 @@ void SPI::getData(BlackLib::BlackSPI* spi_core,
   while (GDO0->getValue() != "0") { std::cout << GDO0->getValue() << std::endl; };
   spi_core->transfer(SRX);
   spi_core->close();
-
+  if (this->status_counter >= 3) {
+    std::string strKey = "bDA_status";
+    std::string strStatus = "down";
+    if (this->redis_cli.Set(strKey, strStatus) == RC_SUCCESS) {
+      std::cout << "Board down" << std::endl;
+    } else {
+      std::cout << "fuck you bitch" << std::endl;
+    }
+  }
+  this->status_counter++;
 }
 
 /*
@@ -160,11 +154,17 @@ void SPI::getData(BlackLib::BlackSPI* spi_core,
  */
 void SPI::readData(BlackLib::BlackSPI* spi_core)
 {
+  this->status_counter = 0;
+  std::string statusKey = "bDA_status";
+  std::string status = "up";
+  if (this->redis_cli.Set(statusKey, status) == RC_SUCCESS) {
+    std::cout << "RX_STATUS" << std::endl;
+  } else {
+    std::cout << "fuck you bitch" << std::endl;
+  }
   bool isOpened = spi_core->open(BlackLib::ReadWrite);
   spi_core->transfer(SIDLE);
   uint8_t rx_fifo[1] = { RXFIFO|READ_BURST };
-  uint8_t preamble[4];
-  uint8_t status[2];
   uint8_t packet_length[1];
   uint8_t rx_buffer[17];
 
@@ -180,7 +180,7 @@ void SPI::readData(BlackLib::BlackSPI* spi_core)
   std::cout << data_arr << std::endl;
   std::string strKey = "bDA_data";
   if (this->redis_cli.Set(strKey, data_arr) == RC_SUCCESS) {
-    std::cout << "I'm yung" << std::endl;
+    std::cout << "RX_DATA" << std::endl;
   } else {
     std::cout << "fuck you bitch" << std::endl;
   }

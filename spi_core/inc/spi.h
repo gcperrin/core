@@ -20,6 +20,7 @@ class SPI
   void set_rx(BlackLib::BlackSPI* spi_core);
   void flush_rx(BlackLib::BlackSPI* spi_core);
   bool is_up;
+  int status_counter;
 
  private:
   CRedisClient redis_cli;

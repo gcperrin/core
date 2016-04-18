@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
   // Data request timer & callback function
   GSList* List;
-  g_timeout_add_seconds(5, dataRequest, List);
+  g_timeout_add_seconds(7, dataRequest, List);
 
   // Run gLib loop
   g_main_loop_run(loop);

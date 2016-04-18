@@ -1,6 +1,6 @@
 var cron = require('cron');
-var http   = require('http');
-var mqtt   = require('mqtt');
+var http = require('http');
+var mqtt = require('mqtt');
 var events = require('events');
 var assert = require('assert');
 var fs = require('fs');
@@ -20,31 +20,35 @@ console.log('Server running at http://' + IP + ':' + PORT + '/');
 var client  = mqtt.connect(CLIENT_IP);
 var redisClient = redis.createClient();
 var publishEvent = new events.EventEmitter();
-
+var BoardPacket = function() {
+    this.id = 'bDA';
+    this.status = null;
+    this.data = null;
+}
 
 client.on('connect', function () {
     console.log("Connected to MQTT.");
     publishEvent.emit('publish', 'test', 'test_message');
 });
-/*
-client.on('message', function (topic, message) {
-    var retvalkeys = Object.keys(returnval);
-    // Parse message
-    var removeNS = (message.toString()).split('=');
-    var msgSplit = (removeNS[2].toString()).split(',');
 
-});
-*/
 publishEvent.on('publish', function(topic, payload) {
-    var CronJob = cron.CronJob;
+    const CronJob = cron.CronJob;
     var new_pay;
-    new CronJob('* * * * * *', function() {
-	redisClient.get("bDA_data", function(err, reply) {
-	    // reply is null when the key is missing 
-	    console.log(reply);
-	    new_pay = reply;
+    var packet = new BoardPacket();
+    new CronJob('*/7 * * * * *', function() {
+	redisClient.get('bDA_status', function(err, boardStatus) {
+	    packet.status = boardStatus;
+	    if (boardStatus === 'up') {
+		redisClient.get('bDA_data', function(err, data) {
+		    packet.data = data;
+		});
+	    }
 	});
-	console.log('You will see this message every second');
-	client.publish(topic, new_pay);
+	var packetString = JSON.stringify(packet);
+	console.log('Sending packet');
+	client.publish(topic, packetString);
+	if (DEBUG === true) {
+	    console.log(packet);
+	}
     }, null, true, 'America/Los_Angeles');
 });
